@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:io';
 
 import 'package:iquit/model/StreaksDurationModel.dart';
 import 'package:path/path.dart';
@@ -8,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 
 class DatabaseConfiguration {
   static final _databaseName = "MyDatabase.db";
-  static final _databaseVersion = 1;
+  static final _databaseVersion = 2;
 
   static final String STREAKS_TABLE = "streaks";
 
@@ -35,7 +33,8 @@ class DatabaseConfiguration {
   _onCreate(Database db, int version) async {
     return db.execute(
       "CREATE TABLE $STREAKS_TABLE ("
-          "beginDate TEXT PRIMARY KEY, "
+          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "beginDate TEXT, "
           "endDate TEXT, "
           "durationInSeconds INTEGER, "
           "durationInMinutes INTEGER, "
@@ -49,16 +48,17 @@ class DatabaseConfiguration {
 
   Future<int> insertStreak(StreaksDurationModel model) async {
     Database db = await instance.database;
-    return db.insert(STREAKS_TABLE, model.toMap());
+    return db.insert(STREAKS_TABLE, model.toMapWithoutId());
   }
 
   Future<List<StreaksDurationModel>> getAllStreaks() async {
     Database db = await instance.database;
     List<StreaksDurationModel> resultList = new List();
     if (db.isOpen) {
-      List<Map> resultMap = await db.query(STREAKS_TABLE);
+      List<Map> resultMap = await db.query(STREAKS_TABLE,orderBy: "id DESC");
       if (resultMap.isNotEmpty) {
         resultMap.forEach((element) {
+          print(element);
           resultList.add(StreaksDurationModel.fromMap(element));
         });
       }

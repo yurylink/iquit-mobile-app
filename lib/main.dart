@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iquit/BenefitsList.dart';
 import 'package:iquit/CircleStreaks.dart';
+import 'package:iquit/LastStreaksMainScreen.dart';
 import 'package:iquit/SpaceBox.dart';
 import 'package:iquit/database/DatabaseConfiguration.dart';
 
@@ -45,11 +46,14 @@ class _MyHomePageState extends State<MyHomePage> {
   static const duration = const Duration(seconds: 1);
 
   int _counter = 0;
+  bool _isRunning = false;
   DateTime _beginningOfStreak;
   String _displayText;
+  List<StreaksDurationModel> _listOfPreviousStreaks = new List<StreaksDurationModel>();
 
   void _initStreak() {
     setState(() {
+      _isRunning = true;
       _beginningOfStreak = new DateTime.now().subtract(new Duration(
           days: _counter)); //TODO REMOVE THE SUBTRACT ON FINAL VERSION
     });
@@ -57,11 +61,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _endStreak() async {
     Future<int> result = DatabaseConfiguration.instance.insertStreak(
-        new StreaksDurationModel(_beginningOfStreak, DateTime.now()));
+        new StreaksDurationModel(null, _beginningOfStreak, DateTime.now()));
     result.whenComplete(() => {
           setState(() {
+            _isRunning = false;
             _beginningOfStreak = null;
             _counter = 0;
+            _updateListOfPreviousStreaks();
           })
         });
   }
@@ -73,6 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       resultList.forEach((element) {
         print(element.toString());
+        print(element.toMapWithoutId());
       });
       _counter++;
       _beginningOfStreak = new DateTime.now().subtract(new Duration(
@@ -108,6 +115,15 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _updateListOfPreviousStreaks() async{
+    Future<List<StreaksDurationModel>> futureListOfStreaks =
+        DatabaseConfiguration.instance.getAllStreaks();
+    
+    setState(() {
+      futureListOfStreaks.then((value) => _listOfPreviousStreaks = value);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -140,42 +156,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     ElevatedButton(
                       child: Text("End Streak"),
-                      onPressed: () => _endStreak(),
+                      onPressed: _isRunning ? () => _endStreak() : null,
                     ),
                     ElevatedButton(
                       child: Text("Start Challenge"),
-                      onPressed: () => _initStreak(),
+                      onPressed: _isRunning ? null : () => _initStreak(),
                     )
                   ],
                 ),
               ),
-              Expanded(
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  constraints: BoxConstraints(maxHeight: double.infinity),
-                  color: Colors.black,
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                  child: Column(children: [
-                    Text(
-                      "Last Streak: 15 Days",
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    Text("Last Streak: 15 Days"),
-                    Text("Last Streak: 15 Days"),
-                    Text("Last Streak: 15 Days"),
-                    Text("Last Streak: 15 Days"),
-                    Text("Last Streak: 15 Days"),
-                  ]),
-                ),
-              )
-
-              // Text(
-              //   'You have pushed the button this many times:',
-              // ),
-              // Text(
-              //   '$_counter',
-              //   style: Theme.of(context).textTheme.headline4,
-              // ),
+              LastStreaksMainScreen(_listOfPreviousStreaks)
+              // LastStreaksMainScreen(new List<StreaksDurationModel>())
             ],
           )),
       floatingActionButton: FloatingActionButton(
