@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iquit/model/StreaksDurationModel.dart';
 
 class LastStreaksMainScreen extends StatelessWidget {
+  static final int MAX_LENGHT = 5;
   List<StreaksDurationModel> listOfLastStreaks;
   String _titleText;
 
@@ -26,10 +27,12 @@ class LastStreaksMainScreen extends StatelessWidget {
     ));
 
     listOfLastStreaks.forEach((element) {
-      listOfText.add(Text("Last Streak at " +
-          element.getConvertedEndDate() +
-          " " +
-          element.getMaxStreak()));
+      if (MAX_LENGHT.compareTo(listOfText.length) >= 0) {
+        listOfText.add(Text("Last Streak at " +
+            element.getConvertedEndDate() +
+            " " +
+            element.getMaxStreak()));
+      }
     });
 
     return Expanded(
