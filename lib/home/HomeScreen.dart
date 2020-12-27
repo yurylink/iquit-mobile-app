@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iquit/home/BenefitsList.dart';
-import 'package:iquit/home/CircleStreaks.dart';
+import 'package:iquit/home/CircleTimer.dart';
 import 'package:iquit/home/LastStreaksMainScreen.dart';
 import 'package:iquit/common/SpaceBox.dart';
 import 'package:iquit/database/DatabaseConfiguration.dart';
@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: <Widget>[
               SpaceBox(20),
-              CircleStreaks(_displayText),
+              CircleTimer(_displayText),
               SpaceBox(20),
               BenefitsList(),
               SpaceBox(20),
