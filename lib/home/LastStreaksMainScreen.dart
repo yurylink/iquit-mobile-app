@@ -35,14 +35,12 @@ class LastStreaksMainScreen extends StatelessWidget {
       }
     });
 
-    return Expanded(
-      child: Container(
+    return Container(
         alignment: Alignment.topCenter,
         constraints: BoxConstraints(maxHeight: double.infinity),
         color: Colors.black,
         padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Column(children: listOfText),
-      ),
     );
   }
 }

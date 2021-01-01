@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:iquit/home/PieChart2.dart';
 import 'package:iquit/home/HomeScreen.dart';
 
 void main() {
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomeScreen(title: 'IQuit -  Quit your addictions'),
+      // home: PieChart2(),
     );
   }
 }

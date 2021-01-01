@@ -7,6 +7,7 @@ import 'package:iquit/home/CircleTimer.dart';
 import 'package:iquit/home/LastStreaksMainScreen.dart';
 import 'package:iquit/common/SpaceBox.dart';
 import 'package:iquit/database/DatabaseConfiguration.dart';
+import 'package:iquit/home/PieChart.dart';
 import 'package:iquit/model/StreaksDurationModel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,7 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isRunning = false;
   DateTime _beginningOfStreak;
   String _displayText;
-  List<StreaksDurationModel> _listOfPreviousStreaks = new List<StreaksDurationModel>();
+  List<StreaksDurationModel> _listOfPreviousStreaks =
+      new List<StreaksDurationModel>();
 
   @override
   void initState() {
@@ -38,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
-  
+
   void _startTimer() {
     setState(() {
       _isRunning = true;
@@ -51,25 +53,21 @@ class _HomeScreenState extends State<HomeScreen> {
     Future<int> result = DatabaseConfiguration.instance.insertStreak(
         new StreaksDurationModel(null, _beginningOfStreak, DateTime.now()));
     result.whenComplete(() => {
-      setState(() {
-        _isRunning = false;
-        _beginningOfStreak = null;
-        _counter = 0;
-        _updateListOfPreviousStreaks();
-      })
-    });
+          setState(() {
+            _isRunning = false;
+            _beginningOfStreak = null;
+            _counter = 0;
+            _updateListOfPreviousStreaks();
+          })
+        });
   }
 
   //TODO: REMOVE THIS FUNCTION
   void _incrementCounter() async {
     List<StreaksDurationModel> resultList =
-    await DatabaseConfiguration.instance.getAllStreaks();
+        await DatabaseConfiguration.instance.getAllStreaks();
 
     setState(() {
-      resultList.forEach((element) {
-        print(element.toString());
-        print(element.toMapWithoutId());
-      });
       _counter++;
       _beginningOfStreak = new DateTime.now().subtract(new Duration(
           days: _counter)); //TODO REMOVE THE SUBTRACT ON FINAL VERSION
@@ -84,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
         result.write("No Streak Initialized");
       } else {
         DateTimeRange range =
-        DateTimeRange(start: _beginningOfStreak, end: DateTime.now());
+            DateTimeRange(start: _beginningOfStreak, end: DateTime.now());
         Duration duration = range.duration;
         if (duration.inDays.compareTo(0) > 0) {
           result.write(duration.inDays.toString());
@@ -104,9 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _updateListOfPreviousStreaks() async{
+  void _updateListOfPreviousStreaks() async {
     Future<List<StreaksDurationModel>> futureListOfStreaks =
-    DatabaseConfiguration.instance.getAllStreaks();
+        DatabaseConfiguration.instance.getAllStreaks();
 
     setState(() {
       futureListOfStreaks.then((value) => _listOfPreviousStreaks = value);
@@ -116,43 +114,84 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Align(
-          alignment: Alignment.topCenter,
-          child: Column(
-            children: <Widget>[
-              SpaceBox(20),
-              CircleTimer(_displayText),
-              SpaceBox(20),
-              BenefitsList(),
-              SpaceBox(20),
-              Container(
-                color: Colors.black54,
-                child: ButtonBar(
-                  alignment: MainAxisAlignment.spaceEvenly,
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                child: ListView(
                   children: [
-                    ElevatedButton(
-                      child: Text("End Streak"),
-                      onPressed: _isRunning ? () => _endTimer() : null,
+                    PieChart(),
+                    BenefitsList(),
+                    Container(
+                      color: Colors.black54,
+                      child: ButtonBar(
+                        alignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            child: Text("End Streak"),
+                            onPressed: _isRunning ? () => _endTimer() : null,
+                          ),
+                          ElevatedButton(
+                            child: Text("Start Challenge"),
+                            onPressed: _isRunning ? null : () => _startTimer(),
+                          )
+                        ],
+                      ),
                     ),
-                    ElevatedButton(
-                      child: Text("Start Challenge"),
-                      onPressed: _isRunning ? null : () => _startTimer(),
-                    )
+                    LastStreaksMainScreen(_listOfPreviousStreaks),
                   ],
                 ),
               ),
-              LastStreaksMainScreen(_listOfPreviousStreaks)
-              // LastStreaksMainScreen(new List<StreaksDurationModel>())
-            ],
-          )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+            )
+          ],
+        ));
   }
+
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//       title: Text(widget.title),
+//     ),
+//     body: Align(
+//         alignment: Alignment.topCenter,
+//         child: Column(
+//           children: <Widget>[
+//             SpaceBox(20),
+//             PieChart(),
+//             // CircleTimer(_displayText),
+//             SpaceBox(20),
+//             BenefitsList(),
+//             SpaceBox(20),
+//             Container(
+//               color: Colors.black54,
+//               child: ButtonBar(
+//                 alignment: MainAxisAlignment.spaceEvenly,
+//                 children: [
+//                   ElevatedButton(
+//                     child: Text("End Streak"),
+//                     onPressed: _isRunning ? () => _endTimer() : null,
+//                   ),
+//                   ElevatedButton(
+//                     child: Text("Start Challenge"),
+//                     onPressed: _isRunning ? null : () => _startTimer(),
+//                   )
+//                 ],
+//               ),
+//             ),
+//             LastStreaksMainScreen(_listOfPreviousStreaks)
+//             // LastStreaksMainScreen(new List<StreaksDurationModel>())
+//           ],
+//         )),
+//     floatingActionButton: FloatingActionButton(
+//       onPressed: _incrementCounter,
+//       tooltip: 'Increment',
+//       child: Icon(Icons.add),
+//     ), // This trailing comma makes auto-formatting nicer for build methods.
+//   );
+// }
+
 }
