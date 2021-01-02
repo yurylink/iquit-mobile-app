@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SizedBox(
                 child: ListView(
                   children: [
-                    PieChart(),
+                    PieChart(_displayText),
                     BenefitsList(),
                     Container(
                       color: Colors.black54,

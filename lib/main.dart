@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:iquit/home/PieChart2.dart';
 import 'package:iquit/home/HomeScreen.dart';
 
 void main() {
