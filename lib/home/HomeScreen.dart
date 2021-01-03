@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:iquit/home/BenefitsList.dart';
-import 'package:iquit/home/CircleTimer.dart';
-import 'package:iquit/home/LastStreaksMainScreen.dart';
-import 'package:iquit/common/SpaceBox.dart';
+import 'package:iquit/benefits/BenefitsMainPage.dart';
 import 'package:iquit/database/DatabaseConfiguration.dart';
+import 'package:iquit/development/mock/BenefitsModelMock.dart';
+import 'package:iquit/home/BenefitList.dart';
+import 'package:iquit/home/LastStreaksMainScreen.dart';
 import 'package:iquit/home/PieChart.dart';
+import 'package:iquit/model/BenefitsModel.dart';
 import 'package:iquit/model/StreaksDurationModel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,11 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
   String _displayText;
   List<StreaksDurationModel> _listOfPreviousStreaks =
       new List<StreaksDurationModel>();
+  List<BenefitModel> _listOfBenefits = new List<BenefitModel>();
 
   @override
   void initState() {
     super.initState();
     _updateListOfPreviousStreaks();
+    _updateTheListOfBenefits();
+
     if (timer == null) {
       timer = Timer.periodic(duration, (timer) {
         _resolveText();
@@ -110,6 +114,12 @@ class _HomeScreenState extends State<HomeScreen> {
       futureListOfStreaks.then((value) => _listOfPreviousStreaks = value);
     });
   }
+  
+  void _updateTheListOfBenefits() async{
+    setState(() {
+      _listOfBenefits = BenefitsModelMock.benefitsModelList;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +134,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView(
                   children: [
                     PieChart(_displayText),
-                    BenefitsList(),
+                    GestureDetector(
+                      child: BenefitList(_listOfBenefits),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BenefitsMainPage(_listOfBenefits)));
+                      },
+                    ),
                     Container(
                       color: Colors.black54,
                       child: ButtonBar(

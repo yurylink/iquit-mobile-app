@@ -35,7 +35,7 @@ class CircleTimer extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: new BoxDecoration(
-              color: GlobalColors.DEFAULT_GREY.color, shape: BoxShape.circle),
+              color: GlobalColors.DARK_GREY.color, shape: BoxShape.circle),
           child: Center(
             child: Text(_displayText), //TODO REST
           ),
